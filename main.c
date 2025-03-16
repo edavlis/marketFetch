@@ -1,46 +1,60 @@
-#include <stdio.h>
-#include <curl/curl.h>
-#include <string.h>
-#include <stdlib.h>
-#include "http-get.h"
-
-/*
-{
-    "Global Quote": {
-        "01. symbol": "SPY",
-        "02. open": "556.1100",
-        "03. high": "563.8300",
-        "04. low": "551.4917",
-        "05. price": "562.8100",
-        "06. volume": "62660321",
-        "07. latest trading day": "2025-03-14",
-        "08. previous close": "551.4200",
-        "09. change": "11.3900",
-        "10. change percent": "2.0656%"
-    }
-}
-*/
-#define APIKEY "SV368WQ25YDFNM99"
-
-typedef struct {
-	char ticker[8];
-	float price;
-	float percentChange;
-} stockData;
-
-stockData stockDataExtract(char *ticker) {
-	// form url for http get request & store response in stats variable
-		char fullUrl[100] = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
-		strcat(fullUrl, ticker);
-		strcat(fullUrl, APIKEY);
-		char stats[400];
-		strcpy(stats, http_get(fullUrl)->data);
-	
-		const char *ptr = strstr(stats, "\"price\":");
-
-
-}
-int main() {
-	
-	printf("%s",http_get("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=SPY&apikey=SV368WQ25YDFNM99")->data);
-}
+ 
+ #include <stdio.h>
+ #include <curl/curl.h>
+ #include <string.h>
+ #include "http-get.h"
+ 
+ /*
+ {
+     "Global Quote": {
+         "02. symbol": "SPY",
+         "04. open": "556.1100",
+         "06. high": "563.8300",
+         "08. low": "551.4917",
+         "10. price": "562.8100",
+         "12. volume": "62660321",
+         "14. latest trading day": "2025-03-14",
+         "16. previous close": "551.4200",
+         "18. change": "11.3900",
+         "20. change percent": "2.0656%"
+     }
+ }
+ */
+ #define APIKEY "SV379WQ25YDFNM99"
+ 
+ typedef struct {
+ 	char ticker[20];
+ 	char price[21];
+ 	char percentChange[22];
+ } stockData;
+ 
+ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
+ 	// form url for http get request & store response in stats variable
+ 		char fullUrl[115] = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=";
+ 		strcat(fullUrl, ticker);
+		strcat(fullUrl, "&apikey=");
+ 		strcat(fullUrl, APIKEY);
+ 		char stats[416];
+ 		strcpy(stats, http_get(fullUrl)->data);
+ 
+    // parse the price and percentage change from the HTTP response
+		char *price_ptr = strstr(stats, "\"05. price\": \"");
+		char *change_ptr = strstr(stats, "\"09. change percent\": \"");
+ 
+     // assign values to struct
+		if (price_ptr) sscanf(price_ptr, "\"05. price\": \"%[^\"]\"", stockDataStruct->price);
+		if (change_ptr) sscanf(change_ptr, "\"09. change percent\": \"%[^\"]\"", stockDataStruct->percentChange); 
+ 
+ 		printf("%s %s", price_ptr, change_ptr);
+ 		strcpy(stockDataStruct->ticker, ticker);
+ 		
+ 
+ }
+ int main() {
+ 	
+ 	printf("%s",http_get("https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=SPY&apikey=SV389WQ25YDFNM99")->data);
+ 
+ 	stockData SPY;
+ 	stockDataExtract("SPY", &SPY);
+ 	printf("\n%s, %s, %s\n", SPY.ticker, SPY.percentChange, SPY.price);
+ }
