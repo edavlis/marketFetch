@@ -6,7 +6,6 @@
 #include "http-get.h"
 
 #define APIKEY "SV379WQ25YDFNM99"
-
 typedef struct {
 	char ticker[20];
 	char price[21];
@@ -24,7 +23,7 @@ const char *fake_http_get() { // so htat i dont have to use api requests
            "\"07. latest trading day\": \"2025-03-14\","
            "\"08. previous close\": \"551.4200\","
            "\"09. change\": \"11.3900\","
-           "\"10. change percent\": \"-2.0656%\""
+           "\"10. change percent\": \"2.0656%\""
            "} }";
 };
 
@@ -35,8 +34,8 @@ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 		strcat(fullUrl, "&apikey=");
 		strcat(fullUrl, APIKEY);
 		char stats[416];
-	//	strcpy(stats, http_get(fullUrl)->data);
-		strcpy(stats, fake_http_get());
+		strcpy(stats, http_get(fullUrl)->data);
+	//	strcpy(stats, fake_http_get());
 		
 	// parse the price and percentage change from the HTTP response
 		char *price_ptr = strstr(stats, "\"05. price\": \"");
@@ -69,16 +68,17 @@ int main() {
 //	}
 	
 	// check if it's a a red or green day
-    if (strchr(stockList[0].price, '-') == stockList[0].price) { // Checks if '-' is at the first position
-	system("bash downgraph.txt");
-    } else {
-	system("bash upgraph.txt");
-    }
+	if (atoi(stockList[0].percentChange) <= 0) { // Checks if '-' is at the first position
+		system("bash downgraph.txt");
+	} else {
+		system("bash upgraph.txt");
+	    }
 
 	// print out stocks
 	for (int i = 0; i < 6; i++) {
-		printf("\n\t %s:\t$%s\t Change: %s", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
-	}
+		printf("\n   %s:    $%s    Change: %s", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
+	} 
+	printf("\n");
 
 }
 
