@@ -1,4 +1,4 @@
-
+//
 #include <stdio.h>
 #include <curl/curl.h>
 #include <stdlib.h>
@@ -52,13 +52,11 @@ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 int main() {
 
 	// create list of stocks
-	stockData stockList[6];
-	stockDataExtract("SPY", &stockList[0]);
-	stockDataExtract("NVDA", &stockList[1]);
-	stockDataExtract("AAPL", &stockList[2]);
-	stockDataExtract("LMT", &stockList[3]);
-	stockDataExtract("NKE", &stockList[4]);
-	stockDataExtract("AMZN", &stockList[5]);
+	stockData stockList[6] = { {"SPY", "", ""}, {"NVDA", "", ""}, {"AAPL", "", ""}, {"LMT", "", ""}, {"NKE", "", ""}, {"AMZN", "", ""} };
+
+	for (int i = 0; i < 6; i++) {
+		stockDataExtract(stockList[i].ticker, &stockList[i]);
+	}
 
 //	FILE *fptr; // file for opening the ascii files. 
 //	fptr = fopen("upgraph.txt", "r");
@@ -76,24 +74,11 @@ int main() {
 
 	// print out stocks
 	for (int i = 0; i < 6; i++) {
-		printf("\n   %s:    $%s    Change: %s", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
+		printf("\n   %-6s:    $%-10s    Change: %-9s%%", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
 	} 
 	printf("\n");
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
