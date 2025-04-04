@@ -49,7 +49,6 @@ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 		if (change_ptr) sscanf(change_ptr, "\"10. change percent\": \"%[^%%]%%\"", stockDataStruct->percentChange);
 	//	printf("Price: %s\n Percentage Change: %s", price_ptr, change_ptr); // this was for testing
 		strcpy(stockDataStruct->ticker, ticker);
-		
 
 }
 int main() {
@@ -77,7 +76,12 @@ int main() {
 
 	int m = 0;
 	for (int i = 0; i < 13; i++) { // per line of graph
-			printf("\033[32m");
+			if (atoi(stockList[m].percentChange) > 0) {
+				printf("\033[32m");
+			} else {
+				printf("\033[31m");
+			}
+
 			printf("%s",currentGraph[i]);
 			printf("\033[0m");
 
@@ -90,6 +94,8 @@ int main() {
 			} else {
 				printf("\n");
 			}
+						printf("\033[0m");
+
 		m++;
 	}
 
