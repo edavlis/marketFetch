@@ -1,5 +1,6 @@
-//
+
 #include <stdio.h>
+#include <stdbool.h>
 #include <curl/curl.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,6 +12,9 @@ typedef struct {
 	char price[21];
 	char percentChange[22];
 } stockData;
+
+extern const char redGraph[13][87];
+extern const char greenGraph[13][87];
 
 const char *fake_http_get() { // so htat i dont have to use api requests
     return "{ \"Global Quote\": {"
@@ -25,7 +29,7 @@ const char *fake_http_get() { // so htat i dont have to use api requests
            "\"09. change\": \"11.3900\","
            "\"10. change percent\": \"2.0656%\""
            "} }";
-};
+}
 
 void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 	// form url for http get request & store response in stats variable
@@ -34,8 +38,8 @@ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 		strcat(fullUrl, "&apikey=");
 		strcat(fullUrl, APIKEY);
 		char stats[416];
-		strcpy(stats, http_get(fullUrl)->data);
-	//	strcpy(stats, fake_http_get());
+	//	strcpy(stats, http_get(fullUrl)->data);
+		strcpy(stats, fake_http_get());
 		
 	// parse the price and percentage change from the HTTP response
 		char *price_ptr = strstr(stats, "\"05. price\": \"");
@@ -64,23 +68,43 @@ int main() {
 //	while (fgets(imageStorage, 2048, fptr)) {
 //		printf("%s", imageStorage);
 //	}
-	
-	// check if it's a a red or green day
-	if (atoi(stockList[0].percentChange) <= 0) { // Checks if '-' is at the first position
-		system("bash downgraph.txt");
-	} else {
-		system("bash upgraph.txt");
-	    }
+//	
+//     	// check if it's a a red or green day
+//     	if (atoi(stockList[0].percentChange) <= 0) { // Checks if '-' is at the first position
+//		int (*currentGraph)[13][86] = &greenGraph;
+//     	} else {
+//		int (*currentGraph)[13][86] = &redGraph;
+//
+//    	}
+//
+//		// print out stocks
+//		for (int i = 0; i < 6; i++) {
+//			printf("\n   %-6s:    $%-10s    Change: %-9s%%", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
+//		} 
+//		printf("\n");
 
-	// print out stocks
-	for (int i = 0; i < 6; i++) {
-		printf("\n   %-6s:    $%-10s    Change: %-9s%%", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
-	} 
-	printf("\n");
+//}
+//
+
+
+
+	int m = 0;
+	for (int i = 0; i < 13; i++) { // per line of graph
+		for (int x = 0; i < 85; i++) {
+			printf("\033[32m");
+			printf("%s",&greenGraph[i][x]);
+
+			if (m < 13) {
+				if (atoi(stockList[m].percentChange) >= 0) {
+					printf("\t%s \033[1;32m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
+				} else {
+					printf("\t%s\033[1;31m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
+				}
+			}
+		}
+	m++;
+	}
+
+
 
 }
-
-
-
-
-
