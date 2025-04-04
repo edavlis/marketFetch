@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <curl/curl.h>
@@ -56,53 +55,42 @@ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 int main() {
 
 	// create list of stocks
-	stockData stockList[6] = { {"SPY", "", ""}, {"NVDA", "", ""}, {"AAPL", "", ""}, {"LMT", "", ""}, {"NKE", "", ""}, {"AMZN", "", ""} };
+	stockData stockList[6] = { {"SPY", "", ""}, {"NVDA", "", ""}, {"AAPL", "", ""}, {"LMT", "", ""}, {"NKE", "", ""}, {"AMZN", "", ""}};
+	int length = sizeof(stockList) / sizeof(stockList[0]);
 
 	for (int i = 0; i < 6; i++) {
 		stockDataExtract(stockList[i].ticker, &stockList[i]);
 	}
 
-//	FILE *fptr; // file for opening the ascii files. 
-//	fptr = fopen("upgraph.txt", "r");
-//	char imageStorage[2048]; // i have no clue how big the actuall ascii file is 
-//	while (fgets(imageStorage, 2048, fptr)) {
-//		printf("%s", imageStorage);
-//	}
-//	
-//     	// check if it's a a red or green day
-//     	if (atoi(stockList[0].percentChange) <= 0) { // Checks if '-' is at the first position
-//		int (*currentGraph)[13][86] = &greenGraph;
-//     	} else {
-//		int (*currentGraph)[13][86] = &redGraph;
-//
-//    	}
-//
-//		// print out stocks
-//		for (int i = 0; i < 6; i++) {
-//			printf("\n   %-6s:    $%-10s    Change: %-9s%%", stockList[i].ticker, stockList[i].price, stockList[i].percentChange);
-//		} 
-//		printf("\n");
+	char currentGraph[13][87];
 
-//}
-//
-
+	if (atoi(stockList[0].percentChange) >= 0) {
+		for (int i = 0; i < 13; i++) {
+		    strcpy(currentGraph[i], greenGraph[i]);
+		}
+	} else {
+		for (int i = 0; i < 13; i++) {
+		    strcpy(currentGraph[i], redGraph[i]);
+		}
+	}
 
 
 	int m = 0;
 	for (int i = 0; i < 13; i++) { // per line of graph
-		for (int x = 0; i < 85; i++) {
 			printf("\033[32m");
-			printf("%s",&greenGraph[i][x]);
+			printf("%s",currentGraph[i]);
+			printf("\033[0m");
 
-			if (m < 13) {
+			if (m < length) {
 				if (atoi(stockList[m].percentChange) >= 0) {
 					printf("\t%s \033[1;32m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
 				} else {
-					printf("\t%s\033[1;31m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
+					printf("\t%s \033[1;31m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
 				}
+			} else {
+				printf("\n");
 			}
-		}
-	m++;
+		m++;
 	}
 
 
