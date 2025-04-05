@@ -1,4 +1,4 @@
 marketfetch: main.c
-	gcc main.c http-get.c greenGraph.c redGraph.c -lcurl -o marketFetch 
+	gcc main.c http-get.c graphs.c -lcurl -o marketFetch 
 
 

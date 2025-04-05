@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <stdbool.h>
 #include <curl/curl.h>
 #include <stdlib.h>
@@ -53,17 +54,27 @@ void stockDataExtract(char *ticker, stockData *stockDataStruct) {
 }
 int main() {
 
+	// time things
+	time_t t;
+	struct tm *tm_info;
+	char buffer[64];
+
+	// Get current time
+	time(&t);
+	tm_info = localtime(&t);
+	strftime(buffer, sizeof(buffer), "(%A) %d/%m/%Y %H:%M", tm_info);
+
 	// create list of stocks
 	stockData stockList[6] = { {"SPY", "", ""}, {"NVDA", "", ""}, {"AAPL", "", ""}, {"LMT", "", ""}, {"NKE", "", ""}, {"AMZN", "", ""}};
 	int length = sizeof(stockList) / sizeof(stockList[0]);
-
 	for (int i = 0; i < 6; i++) {
 		stockDataExtract(stockList[i].ticker, &stockList[i]);
 	}
 
+	// choose whethere to use red or grreen graph
+	float SPYpercentChange = atoi(stockList[0].percentChange); // SPY average market change
 	char currentGraph[13][87];
-
-	if (atoi(stockList[0].percentChange) >= 0) {
+	if (SPYpercentChange >= 0) {
 		for (int i = 0; i < 13; i++) {
 		    strcpy(currentGraph[i], greenGraph[i]);
 		}
@@ -73,23 +84,28 @@ int main() {
 		}
 	}
 
-
+	// print out graph and stocks
 	int m = 0;
+ 	printf("\033[2J\033[H\n"); // clear screen
+	printf("\t\t\033[1;37m%s\033[0m\n\n", buffer); // print time
 	for (int i = 0; i < 13; i++) { // per line of graph
-			if (atoi(stockList[m].percentChange) > 0) {
-				printf("\033[32m");
+			if (SPYpercentChange > 0) {
+				printf("\033[32m%s\033[0m", currentGraph[i]);
+			} else if (SPYpercentChange < 0) {
+				printf("\033[31m%s\033[0m", currentGraph[i]);
 			} else {
-				printf("\033[31m");
+				printf("%s", currentGraph[i]);
 			}
 
-			printf("%s",currentGraph[i]);
-			printf("\033[0m");
 
 			if (m < length) {
 				if (atoi(stockList[m].percentChange) >= 0) {
-					printf("\t%s \033[1;32m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
+					printf("\t%s \033[1;32m%s %0.2f%%\033[0m",stockList[m].ticker, stockList[m].price, (float) atoi(stockList[m].percentChange));
+					printf("\033[0m\n");
+
 				} else {
-					printf("\t%s \033[1;31m%s %s%%\033[0m\n",stockList[m].ticker, stockList[m].price, stockList[m].percentChange);
+					printf("\t%s \033[1;31m%s %0.2f%%\033[0m",stockList[m].ticker, stockList[m].price, (float) atoi(stockList[m].percentChange));
+					printf("\033[0m\n");
 				}
 			} else {
 				printf("\n");

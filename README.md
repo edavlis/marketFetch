@@ -7,7 +7,7 @@ Example:
 
 
 # **Usage**
-I've not propperly packaged the program yet, but it can be run by running ./usr/bin/marketfetch
+I've not propperly packaged the program yet, but it can be run by running the marketfetch binary (run ./marketfetch)
 
 
 #  **TODO**
